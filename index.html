@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delta Offline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            background: url('https://i.ibb.co/5X5sppWw/NsfA5uf.png') no-repeat center center fixed;
+            background-size: cover;
+            text-align: center;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .background-blur {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            filter: blur(10px);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 90%;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 10;
+        }
+
+        .animated-text {
+            font-size: 18px;
+            font-weight: bold;
+            overflow: hidden;
+            display: inline-block;
+            text-align: center;
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: 100%;
+            border-right: 3px solid white;
+        }
+
+        .secondary-text {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 15px;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 10px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .discord-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .discord-link img {
+            width: 32px;
+            height: 32px;
+            transition: transform 0.2s ease;
+        }
+
+        .discord-link img:hover {
+            transform: scale(1.1);
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-blur"></div>
+    <canvas id="particles"></canvas>
+
+    <div class="container">
+        <p id="text" class="animated-text"></p>
+        <p class="secondary-text">
+            Tem dúvidas ou quer sugerir novos executores para o site? Acesse nossa plataforma de comunicação.
+        </p>
+
+        <div class="discord-link">
+            <a href="https://discord.gg/domius" target="_blank">
+                <img src="https://cdn-icons-png.flaticon.com/512/2111/2111370.png" alt="Discord">
+            </a>
+        </div>
+    </div>
+
+    <p class="footer">© 2025 Grupo Domius - Todos os direitos reservados</p>
+
+    <script>
+        // Texto animado digitando
+        const text = "Infelizmente, o Delta ainda está offline por um novo anti-cheat feito para a versão Android. Para sua segurança, removemos o Delta Executor até que o mesmo lance uma atualização segura para todos os utilizadores. Cordialmente, Grupo Domius.";
+
+        const textElement = document.getElementById("text");
+        let index = 0;
+
+        function typeEffect() {
+            if (index < text.length) {
+                textElement.innerHTML += text[index];
+                index++;
+                setTimeout(typeEffect, 50);
+            } else {
+                textElement.style.borderRight = "none";
+            }
+        }
+
+        typeEffect();
+
+        // Efeito de partículas brancas flutuantes
+        const canvas = document.getElementById("particles");
+        const ctx = canvas.getContext("2d");
+        let particles = [];
+
+        function Particle() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.radius = Math.random() * 3 + 1;
+            this.speedX = (Math.random() - 0.5) * 1;
+            this.speedY = (Math.random() - 0.5) * 1;
+            this.opacity = Math.random() * 0.5 + 0.3;
+        }
+
+        Particle.prototype.update = function() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+
+            if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        };
+
+        Particle.prototype.draw = function() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+            ctx.fill();
+        };
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            for (let i = 0; i < 80; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        window.addEventListener("resize", init);
+    </script>
+
+</body>
+</html>
