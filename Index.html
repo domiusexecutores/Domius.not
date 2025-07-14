@@ -1,0 +1,283 @@
+<!DOCTYPE html><html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APPLE HUB</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: white;
+      background: url('https://cdn.discordapp.com/attachments/1291075417683267715/1394058318867075153/M4e23.png?ex=6876163b&is=6874c4bb&hm=e4579ea3797fb63af3bacd008b3dc15cc8a77060699c57392f1ee3e093a7da49') no-repeat center center fixed;
+      background-size: cover;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: -1;
+    }
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
+    header {
+      background-color: rgba(31, 31, 31, 0.8);
+      padding: 20px;
+      font-size: 32px;
+      font-weight: bold;
+      text-align: center;
+    }
+    nav {
+      text-align: center;
+      margin: 20px;
+    }
+    nav button {
+      margin: 5px;
+      padding: 10px 20px;
+      background-color: #222;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .tab-container {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      width: 100vw;
+    }
+    .tab {
+      min-width: 100vw;
+      scroll-snap-align: start;
+      padding: 20px;
+    }
+    .section {
+      margin: 20px auto;
+      width: 90%;
+      max-width: 800px;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .section h2 {
+      font-size: 26px;
+      color: #00ffcc;
+      margin-bottom: 10px;
+    }
+    .section h3 {
+      color: #ffcc00;
+    }
+    .section ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .section li {
+      font-size: 18px;
+      margin: 5px 0;
+    }
+    .copy-box {
+      background-color: #333;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+      word-break: break-word;
+    }
+    .copy-box p {
+      font-size: 14px;
+      background-color: #1e1e1e;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .copy-button {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #00cc88;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    .copy-success {
+      background-color: #00cc00 !important;
+    }
+    .copy-msg {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #00cc00;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 0 0 10px 10px;
+      display: none;
+      z-index: 1000;
+    }
+    .executor-buttons button, .discord-links a {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+      text-decoration: none;
+    }
+    .executor-buttons button:hover {
+      background-color: #00cc88;
+    }
+    footer {
+      margin-top: 60px;
+      padding: 10px;
+      font-size: 14px;
+      color: #ccc;
+      text-align: center;
+    }
+    img.discord-icon {
+      width: 40px;
+      height: 40px;
+    }
+    @media (max-width: 600px) {
+      footer {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <div class="copy-msg" id="copiedMsg">Copied successfully!</div>
+  <header>APPLE HUB</header>  <nav>
+    <button onclick="scrollToTab(0)">SCRIPT</button>
+    <button onclick="scrollToTab(1)">DISCORD</button>
+    <button onclick="scrollToTab(2)">EXECUTORES</button>
+  </nav>  <div class="tab-container">
+    <div class="tab" id="script">
+      <div class="section">
+        <h2>Game Support</h2>
+        <h3>Games:</h3>
+        <ul>
+          <li>• Blox Fruits</li>
+          <li>• Glow A Garden</li>
+          <li>• Steal A Brainrot</li>
+        </ul>
+      </div>
+      <div class="section">
+        <h2>Supported Executors</h2>
+        <h3>Android:</h3>
+        <ul>
+          <li>• Delta</li>
+          <li>• Arceus</li>
+          <li>• Codex</li>
+          <li>• Cryptic</li>
+          <li>• Fluxus</li>
+        </ul>
+        <h3>PC:</h3>
+        <ul>
+          <li>• Xeno</li>
+          <li>• Swift</li>
+          <li>• Wave</li>
+          <li>• Fluxus</li>
+        </ul>
+      </div>
+      <div class="section copy-box">
+        <p id="scriptText">In Progress...</p>
+        <button class="copy-button" id="copyBtn" onclick="copyScript()">📋 Copiar Script</button>
+      </div>
+    </div><div class="tab" id="discord">
+  <div class="section discord-links">
+    <img src="https://cdn-icons-png.flaticon.com/512/5968/5968756.png" class="discord-icon" alt="Discord Icon">
+    <h3>Domius</h3>
+    <a href="https://discord.gg/domius-1254584688404729918" target="_blank">JOIN SERVER</a>
+    <br><br>
+    <h3>Apple Hub</h3>
+    <a href="https://discord.gg/domius-1254584688404729918" target="_blank">JOIN SERVER</a>
+  </div>
+</div>
+
+<div class="tab" id="executores">
+  <div class="section executor-buttons">
+    <button onclick="window.location.href='https://www.mediafire.com/folder/f57gcu8krqran/DELTA'">DELTA</button>
+    <button onclick="window.location.href='https://www.mediafire.com/folder/pwu6lshu5p20l/ARCEUS+X'">ARCEUS</button>
+    <button onclick="window.location.href='https://www.mediafire.com/folder/87fu50cnyn2i3/CODEX'">CODEX</button>
+    <button onclick="window.location.href='https://www.mediafire.com/folder/mrvgptltf0j97/FLUXUS'">FLUXUS</button>
+    <button onclick="window.location.href='https://www.mediafire.com/folder/bpkfkfd3d59kp/CRYPTIC'">CRYPTIC</button>
+    <button onclick="window.location.href='https://www.mediafire.com/folder/jrvdldui4jyls/Utilit%C3%A1rios'">UTILITÁRIOS</button>
+  </div>
+</div>
+
+  </div>  <footer>Domius - Todos os direitos reservados</footer>  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>  <script>
+    function scrollToTab(index) {
+      const container = document.querySelector('.tab-container');
+      container.scrollTo({ left: index * window.innerWidth, behavior: 'smooth' });
+    }
+
+    function copyScript() {
+      const scriptText = document.getElementById("scriptText").innerText;
+      const copyBtn = document.getElementById("copyBtn");
+      navigator.clipboard.writeText(scriptText).then(() => {
+        copyBtn.classList.add("copy-success");
+        copyBtn.textContent = "✅ Copied!";
+        const msg = document.getElementById("copiedMsg");
+        msg.style.display = 'block';
+        setTimeout(() => {
+          msg.style.display = 'none';
+          copyBtn.textContent = "📋 Copiar Script";
+          copyBtn.classList.remove("copy-success");
+        }, 2000);
+      });
+    }
+
+    particlesJS('particles-js', {
+      "particles": {
+        "number": {
+          "value": 80
+        },
+        "size": {
+          "value": 3
+        },
+        "move": {
+          "direction": "bottom",
+          "speed": 1
+        },
+        "opacity": {
+          "value": 0.5
+        },
+        "color": {
+          "value": "#ffffff"
+        },
+        "line_linked": {
+          "enable": false
+        }
+      },
+      "interactivity": {
+        "events": {
+          "onhover": {
+            "enable": false
+          },
+          "onclick": {
+            "enable": false
+          }
+        }
+      }
+    });
+  </script></body>
+</html>
