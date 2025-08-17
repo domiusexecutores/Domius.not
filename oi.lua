@@ -1258,6 +1258,67 @@ button.MouseButton1Click:Connect(function()
         shrink:Play()
     end)
 end)
+local selectedStat = "Defense"
+local pointsPerCycle = 1
+local auto = false
+
+local StatsEvent = game:GetService("ReplicatedStorage")
+    :WaitForChild("BetweenSides")
+    :WaitForChild("Remotes")
+    :WaitForChild("Events")
+    :WaitForChild("StatsEvent")
+
+local Dropdown = t:AddDropdown("DropdownStat", {
+    Title = "Select Status",
+    Description = "Qual status você quer upar",
+    Values = {"Defense", "Gun", "Sword", "Strength", "DevilFruit"},
+    Default = "Defense",
+    Callback = function(v)
+        selectedStat = v
+    end
+})
+
+local Slider = t:AddSlider("SliderPoints", {
+    Title = "Amount",
+    Description = "",
+    Default = 1,
+    Min = 1,
+    Max = 100,
+    Rounding = 0,
+    Callback = function(v)
+        pointsPerCycle = v
+    end
+})
+
+local Toggle = t:AddToggle("ToggleAutoStatus", {
+    Title = "Auto Status",
+    Default = false,
+    Callback = function(state)
+        auto = state
+        if auto then
+            task.spawn(function()
+                while auto do
+                    for i = 1, pointsPerCycle do
+                        local args = {
+                            [1] = "UpgradeStat",
+                            [2] = {
+                                Defense = 0,
+                                Gun = 0,
+                                Sword = 0,
+                                Strength = 0,
+                                DevilFruit = 0
+                            }
+                        }
+                        args[2][selectedStat] = 1
+                        StatsEvent:FireServer(unpack(args))
+                        task.wait(0.1)
+                    end
+                    task.wait(0.3)
+                end
+            end)
+        end
+    end
+})
 local sesico = t:AddSection("Farming:")
 
 local toggle = t:AddToggle("Auto Farm Level", {
