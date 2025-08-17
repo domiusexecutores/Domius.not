@@ -1394,3 +1394,30 @@ local Dropdown = s:AddDropdown("DropdownExample", {
         Settings.SelectedTool = Value
     end
 })
+local configSection = s:AddSection("time:")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local DialogueEvent = ReplicatedStorage:WaitForChild("BetweenSides").Remotes.Events.DialogueEvent
+
+local function chooseTeam(teamName)
+    local args = {
+        [1] = "Team",
+        [2] = teamName
+    }
+    DialogueEvent:FireServer(unpack(args))
+end
+
+s:AddButton({
+    Name = "EnterMarines",
+    Text = "Join Marines",
+    Callback = function()
+        chooseTeam("Marines")
+    end
+})
+
+s:AddButton({
+    Name = "EnterPirates",
+    Text = "Join Pirates",
+    Callback = function()
+        chooseTeam("Pirates")
+    end
+})
