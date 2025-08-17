@@ -1270,7 +1270,7 @@ local StatsEvent = game:GetService("ReplicatedStorage")
 
 local Dropdown = t:AddDropdown("DropdownStat", {
     Title = "Select Status",
-    Description = "Qual status você quer upar",
+    Description = "",
     Values = {"Defense", "Gun", "Sword", "Strength", "DevilFruit"},
     Default = "Defense",
     Callback = function(v)
