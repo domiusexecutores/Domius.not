@@ -1410,7 +1410,7 @@ s:AddButton({
     Title = "Join Marines",
     Description = "",
     Callback = function()
-        chooseTeam("Marines")
+        chooseTeam("Marine")
     end
 })
 
@@ -1418,6 +1418,6 @@ s:AddButton({
     Title = "Join Pirates",
     Description = "",
     Callback = function()
-        chooseTeam("Pirates")
+        chooseTeam("Pirate")
     end
 })
