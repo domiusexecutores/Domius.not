@@ -371,7 +371,7 @@ local t = Window:AddTab({
 })
 local s = Window:AddTab({
 	Title = "Settings",
-	Icon = "Settings"
+	Icon = "settings"
 })
 local sv = Window:AddTab({
 	Title = "Shop",
