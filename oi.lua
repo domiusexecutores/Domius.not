@@ -523,6 +523,32 @@ local toggle = sv:AddToggle("AutoBuyToggle", {
         end
     end
 })
+local configSection = sv:AddSection("Others:")
+local DialogueEvent = game:GetService("ReplicatedStorage")
+    :WaitForChild("BetweenSides")
+    :WaitForChild("Remotes")
+    :WaitForChild("Events")
+    :WaitForChild("DialogueEvent")
+
+local FightingStyles = {
+    "Eletric",
+    "Water Kung-Fu",
+    "Dark Step"
+}
+
+local Dropdown = sv:AddDropdown("DropdownFightingStyle", {
+    Title = "Select Fighting equip",
+    Description = "",
+    Values = FightingStyles,
+    Default = "Dark Step",
+    Callback = function(selected)
+        local args = {
+            [1] = "LearnFightingStyle",
+            [2] = selected
+        }
+        DialogueEvent:FireServer(unpack(args))
+    end
+})
 
 local islands = {
     ["Air jump island"] = CFrame.new(3303.12891, 9.49221897, -4136.46143),
@@ -1399,18 +1425,20 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DialogueEvent = ReplicatedStorage:WaitForChild("BetweenSides").Remotes.Events.DialogueEvent
 
 local function chooseTeam(teamName)
-    local args = {
-        [1] = "Team",
-        [2] = teamName
-    }
-    DialogueEvent:FireServer(unpack(args))
+    task.delay(2, function()
+        local args = {
+            [1] = "Team",
+            [2] = teamName
+        }
+        DialogueEvent:FireServer(unpack(args))
+    end)
 end
 
 s:AddButton({
     Title = "Join Marines",
     Description = "",
     Callback = function()
-        chooseTeam("Marine")
+        chooseTeam("Marines")
     end
 })
 
@@ -1418,6 +1446,6 @@ s:AddButton({
     Title = "Join Pirates",
     Description = "",
     Callback = function()
-        chooseTeam("Pirate")
+        chooseTeam("Pirates")
     end
 })
