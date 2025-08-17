@@ -369,6 +369,10 @@ local t = Window:AddTab({
 	Title = "Farm",
 	Icon = "home"
 })
+local s = Window:AddTab({
+	Title = "Settings",
+	Icon = "Settings"
+})
 local sv = Window:AddTab({
 	Title = "Shop",
 	Icon = "shopping-cart"
@@ -1359,16 +1363,16 @@ local toggle = t:AddToggle("Auto Farm Level", {
 	end
 })
 
-local configSection = t:AddSection("Config")
+local configSection = s:AddSection("Config")
 
-local toggle = t:AddToggle("Click V2", {
+local toggle = s:AddToggle("Click V2", {
 	Title = "Click V2",
 	Default = false,
 	Callback = function(state)
 		Settings.ClickV2 = state
 	end
 })
-local Slider = t:AddSlider("SliderExample", {
+local Slider = s:AddSlider("SliderExample", {
     Title = "Tween Speed",
     Description = "Adjust the movement speed",
     Default = 125,
@@ -1380,7 +1384,7 @@ local Slider = t:AddSlider("SliderExample", {
     end
 })
 
-local Dropdown = t:AddDropdown("DropdownExample", {
+local Dropdown = s:AddDropdown("DropdownExample", {
     Title = "Select Tool",
     Description = "Choose the tool you want to use",
     Values = {"CombatType", "Sword", "Gun", "Magic"},
