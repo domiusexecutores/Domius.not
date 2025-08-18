@@ -370,8 +370,8 @@ local t = Window:AddTab({
 	Icon = "home"
 })
 local se = Window:AddTab({
-	Title = "Server",
-	Icon = "moon-star"
+	Title = "Status",
+	Icon = "sun-medium"
 })
 
 local s = Window:AddTab({
@@ -587,52 +587,6 @@ se:AddButton({
     Callback = function()
         currentJobId = ""
         jobInput:SetValue("")
-    end
-})
-local sectionJobid = s:AddSection("Speed");
-local speedValue = 50
-local autoSpeed = false
-local speedLoopRunning = false
-
-local Slider = s:AddSlider("SliderSpeed", {
-    Title = "Speed",
-    Description = "Define your movement speed",
-    Default = 50,
-    Min = 1,
-    Max = 300,
-    Rounding = 0,
-    Callback = function(v)
-        speedValue = v
-    end
-})
-
-local Toggle = s:AddToggle("ToggleAutoSpeed", {
-    Title = "Auto Speed",
-    Default = false,
-    Callback = function(state)
-        autoSpeed = state
-        if autoSpeed and not speedLoopRunning then
-            speedLoopRunning = true
-            task.spawn(function()
-                while autoSpeed do
-                    local player = game.Players.LocalPlayer
-                    if player.Character and player.Character:FindFirstChild("Humanoid") then
-                        player.Character.Humanoid.WalkSpeed = speedValue
-                    end
-                    task.wait(0.05)
-                end
-                speedLoopRunning = false
-                local player = game.Players.LocalPlayer
-                if player.Character and player.Character:FindFirstChild("Humanoid") then
-                    player.Character.Humanoid.WalkSpeed = 16
-                end
-            end)
-        elseif not autoSpeed and not speedLoopRunning then
-            local player = game.Players.LocalPlayer
-            if player.Character and player.Character:FindFirstChild("Humanoid") then
-                player.Character.Humanoid.WalkSpeed = 16
-            end
-        end
     end
 })
 
@@ -1374,6 +1328,45 @@ button.MouseButton1Click:Connect(function()
         shrink:Play()
     end)
 end)
+local sesico = t:AddSection("Farming:")
+
+local toggle = t:AddToggle("Auto Farm Level", {
+	Title = "Auto Farm Level",
+	Default = false,
+	Callback = function(state)
+		_ENV.OnFarm = state
+		
+		while task.wait() and _ENV.OnFarm do
+			local CurrentQuest = GetCurrentQuest()
+			if not CurrentQuest then continue end
+			
+			if not HasQuest(CurrentQuest.Target) then
+				TakeQuest(CurrentQuest.NpcName, CurrentQuest.Id)
+				continue
+			end
+			
+			local Enemy = GetClosestEnemy(CurrentQuest.Target)
+			if not Enemy then continue end
+			
+			local HumanoidRootPart = Enemy:FindFirstChild("HumanoidRootPart")
+			
+			if HumanoidRootPart then
+				if not HumanoidRootPart:FindFirstChild("BodyVelocity") then
+					local BV = Instance.new("BodyVelocity", HumanoidRootPart)
+					BV.Velocity = Vector3.zero
+					BV.MaxForce = Vector3.one * math.huge
+				end
+				
+				HumanoidRootPart.Size = Vector3.one * 35
+				HumanoidRootPart.CanCollide = false
+				
+				EquipCombat(true)
+				DealDamage({ Enemy })
+				PlayerTP((HumanoidRootPart.CFrame + Vector3.yAxis * 10) * CFrameAngle)
+			end
+		end
+	end
+})
 local selectedStat = "Defense"
 local pointsPerCycle = 1
 local auto = false
@@ -1435,45 +1428,6 @@ local Toggle = t:AddToggle("ToggleAutoStatus", {
         end
     end
 })
-local sesico = t:AddSection("Farming:")
-
-local toggle = t:AddToggle("Auto Farm Level", {
-	Title = "Auto Farm Level",
-	Default = false,
-	Callback = function(state)
-		_ENV.OnFarm = state
-		
-		while task.wait() and _ENV.OnFarm do
-			local CurrentQuest = GetCurrentQuest()
-			if not CurrentQuest then continue end
-			
-			if not HasQuest(CurrentQuest.Target) then
-				TakeQuest(CurrentQuest.NpcName, CurrentQuest.Id)
-				continue
-			end
-			
-			local Enemy = GetClosestEnemy(CurrentQuest.Target)
-			if not Enemy then continue end
-			
-			local HumanoidRootPart = Enemy:FindFirstChild("HumanoidRootPart")
-			
-			if HumanoidRootPart then
-				if not HumanoidRootPart:FindFirstChild("BodyVelocity") then
-					local BV = Instance.new("BodyVelocity", HumanoidRootPart)
-					BV.Velocity = Vector3.zero
-					BV.MaxForce = Vector3.one * math.huge
-				end
-				
-				HumanoidRootPart.Size = Vector3.one * 35
-				HumanoidRootPart.CanCollide = false
-				
-				EquipCombat(true)
-				DealDamage({ Enemy })
-				PlayerTP((HumanoidRootPart.CFrame + Vector3.yAxis * 10) * CFrameAngle)
-			end
-		end
-	end
-})
 
 local configSection = s:AddSection("Config")
 
@@ -1533,5 +1487,97 @@ s:AddButton({
     Description = "",
     Callback = function()
         chooseTeam("Pirates")
+    end
+})
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local StarterGui = game:GetService("StarterGui")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+local function boostGraphics()
+    Lighting.GlobalShadows = false
+    Lighting.FogEnd = 9e9
+    Lighting.Brightness = 1
+    Lighting.Ambient = Color3.new(1,1,1)
+    Lighting.OutdoorAmbient = Color3.new(1,1,1)
+    
+    for _, v in pairs(Workspace:GetDescendants()) do
+        if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Beam") or v:IsA("Explosion") then
+            v:Destroy()
+        elseif v:IsA("Decal") or v:IsA("Texture") then
+            v.Transparency = 1
+        elseif v:IsA("MeshPart") or v:IsA("Part") then
+            v.Material = Enum.Material.Plastic
+            v.Reflectance = 0
+        elseif v:IsA("UnionOperation") then
+            v.Material = Enum.Material.Plastic
+            v.Reflectance = 0
+        end
+    end
+
+    for _, v in pairs(StarterGui:GetDescendants()) do
+        if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Beam") then
+            v:Destroy()
+        end
+    end
+end
+
+local function removeCharacterDetails()
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("MeshPart") or part:IsA("Part") or part:IsA("Accessory") then
+            part.Transparency = 1
+        end
+    end
+end
+
+s:AddButton({
+    Title = "Boost Fps",
+    Description = "",
+    Callback = function()
+        boostGraphics()
+        removeCharacterDetails()
+        RunService.RenderStepped:Connect(function()
+            boostGraphics()
+        end)
+    end
+})
+local Lighting = game:GetService("Lighting")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+
+local noFogConnection
+
+local function enableNoFog()
+    if noFogConnection then return end -- evita múltiplas conexões
+
+    noFogConnection = RunService.RenderStepped:Connect(function()
+        if Lighting:FindFirstChildOfClass("Atmosphere") then
+            Lighting:FindFirstChildOfClass("Atmosphere"):Destroy()
+        end
+
+        Lighting.FogStart = 0
+        Lighting.FogEnd = 1e9
+        Lighting.FogColor = Color3.new(1,1,1)
+
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") or obj:IsA("Smoke") or obj:IsA("Fire") then
+                obj.Enabled = false
+            end
+            if obj:IsA("FogVolume") then
+                obj:Destroy()
+            end
+        end
+    end)
+end
+
+s:AddButton({
+    Title = "No Fog",
+    Description = "",
+    Callback = function()
+        enableNoFog()
     end
 })
