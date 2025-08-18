@@ -62,7 +62,7 @@ end
 
 local Settings = {
 	ClickV2 = false;
-	TweenSpeed = 125;
+	TweenSpeed = 60;
 	SelectedTool = "CombatType";
 }
 
@@ -1659,6 +1659,56 @@ local autoCollectToggle = t:AddToggle("AutoCollectChests", {
         toggleEnabled = state
         if toggleEnabled then
             coroutine.wrap(autoCollect)()
+        end
+    end
+})
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local player = Players.LocalPlayer
+local placeId = game.PlaceId
+
+local toggle = se:AddToggle("AntiKickToggle", {
+    Title = "anti kick",
+    Description = "vision test",
+    Default = true,
+    Callback = function(state)
+        if state then
+            local mt = getrawmetatable(game)
+            setreadonly(mt, false)
+            local oldNamecall = mt.__namecall
+            local oldIndex = mt.__index
+
+            mt.__namecall = newcclosure(function(self, ...)
+                local method = getnamecallmethod()
+                if self == player and method == "Kick" then
+                    warn("Tentativa de Kick detectada! Bloqueada.")
+                    return
+                end
+                return oldNamecall(self, ...)
+            end)
+
+            mt.__index = newcclosure(function(self, key)
+                if self == player and key == "Kick" then
+                    return function() 
+                        warn("Tentativa de Kick detectada! Bloqueada.") 
+                    end
+                end
+                return oldIndex(self, key)
+            end)
+
+            setreadonly(mt, true)
+
+            spawn(function()
+                while true do
+                    pcall(function()
+                        player.OnClose = function()
+                            wait(2)
+                            TeleportService:Teleport(placeId, player)
+                        end
+                    end)
+                    wait(5)
+                end
+            end)
         end
     end
 })
