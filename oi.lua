@@ -554,42 +554,6 @@ local Dropdown = sv:AddDropdown("DropdownFightingStyle", {
         DialogueEvent:FireServer(unpack(args))
     end
 })
-local sectionJobid = se:AddSection("Status:");
-
-ServerVersionCheck = se:AddParagraph({
-    Title = "Server Version",
-    Content = "Versão: "
-})
-
-spawn(function()
-    local previousVersion = ""
-    while task.wait(1) do
-        local versionObj = game:GetService("Workspace"):FindFirstChild("ServerVersion")
-        local currentVersion = versionObj and versionObj.Value or "Desconhecida"
-        
-        if currentVersion ~= previousVersion then
-            ServerVersionCheck:SetDesc("Versão: " .. currentVersion)
-            previousVersion = currentVersion
-        end
-    end
-end)
-PlayerCountCheck = ss:AddParagraph({
-    Title = "Players",
-    Content = "Player: "
-})
-
-spawn(function()
-    local previousCount = ""
-    while task.wait(1) do
-        local players = game:GetService("Players")
-        local currentCount = players.NumPlayers .. "/" .. players.MaxPlayers
-        
-        if currentCount ~= previousCount then
-            PlayerCountCheck:SetDesc("Player: " .. currentCount)
-            previousCount = currentCount
-        end
-    end
-end)
 local sectionJobid = se:AddSection("Job Id:");
 
 local currentJobId = ""
