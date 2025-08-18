@@ -1662,17 +1662,30 @@ local autoCollectToggle = t:AddToggle("AutoCollectChests", {
         end
     end
 })
-local Players = game:GetService("Players")
-local TeleportService = game:GetService("TeleportService")
-local player = Players.LocalPlayer
-local placeId = game.PlaceId
-
 local toggle = se:AddToggle("AntiKickToggle", {
-    Title = "anti kick",
-    Description = "vision test",
+    Title = "Anti Kick + Auto Reenter",
+    Description = "Bloqueia kicks e reentra automaticamente",
     Default = true,
     Callback = function(state)
         if state then
+            local Players = game:GetService("Players")
+            local TeleportService = game:GetService("TeleportService")
+            local player = Players.LocalPlayer
+            local placeId = game.PlaceId
+
+            if queue_on_teleport then
+                queue_on_teleport([[
+                    local Players = game:GetService("Players")
+                    local TeleportService = game:GetService("TeleportService")
+                    local placeId = ]]..placeId..[[
+
+                    spawn(function()
+                        wait(2)
+                        TeleportService:Teleport(placeId, Players.LocalPlayer)
+                    end)
+                ]])
+            end
+
             local mt = getrawmetatable(game)
             setreadonly(mt, false)
             local oldNamecall = mt.__namecall
@@ -1681,7 +1694,10 @@ local toggle = se:AddToggle("AntiKickToggle", {
             mt.__namecall = newcclosure(function(self, ...)
                 local method = getnamecallmethod()
                 if self == player and method == "Kick" then
-                    warn("Tentativa de Kick detectada! Bloqueada.")
+                    warn("Kick bloqueado! Auto Reenter ativado.")
+                    if queue_on_teleport then
+                        queue_on_teleport("game:GetService('TeleportService'):Teleport("..placeId..", game.Players.LocalPlayer)")
+                    end
                     return
                 end
                 return oldNamecall(self, ...)
@@ -1690,25 +1706,16 @@ local toggle = se:AddToggle("AntiKickToggle", {
             mt.__index = newcclosure(function(self, key)
                 if self == player and key == "Kick" then
                     return function() 
-                        warn("Tentativa de Kick detectada! Bloqueada.") 
+                        warn("Kick bloqueado! Auto Reenter ativado.") 
+                        if queue_on_teleport then
+                            queue_on_teleport("game:GetService('TeleportService'):Teleport("..placeId..", game.Players.LocalPlayer)")
+                        end
                     end
                 end
                 return oldIndex(self, key)
             end)
 
             setreadonly(mt, true)
-
-            spawn(function()
-                while true do
-                    pcall(function()
-                        player.OnClose = function()
-                            wait(2)
-                            TeleportService:Teleport(placeId, player)
-                        end
-                    end)
-                    wait(5)
-                end
-            end)
         end
     end
 })
