@@ -1663,8 +1663,8 @@ local autoCollectToggle = t:AddToggle("AutoCollectChests", {
     end
 })
 local toggle = se:AddToggle("AntiKickToggle", {
-    Title = "Anti Kick + Auto Reenter",
-    Description = "Bloqueia kicks e reentra automaticamente",
+    Title = "Anti Kick",
+    Description = "",
     Default = true,
     Callback = function(state)
         if state then
