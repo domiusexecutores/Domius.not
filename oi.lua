@@ -1055,15 +1055,16 @@ RunService.Heartbeat:Connect(function()
         end
     end
 end)
+local AutoStore = false
+
 local toggle = f:AddToggle("AutoStoreToggle", {
     Title = "Auto store",
     Default = true,
     Callback = function(state)
-        getgenv().AutoStore = state
+        AutoStore = state
         if state then
             coroutine.wrap(function()
-                while getgenv().AutoStore do
-                    -- Atualiza o backpack a cada loop
+                while AutoStore do
                     local fruits = {}
                     for _, item in ipairs(backpack:GetChildren()) do
                         if item:IsA("Tool") and item.Name:lower():find("fruit") then
@@ -1072,23 +1073,15 @@ local toggle = f:AddToggle("AutoStoreToggle", {
                     end
 
                     for _, fruit in ipairs(fruits) do
-                        if not getgenv().AutoStore then break end
+                        if not AutoStore then break end
 
                         equipTool(fruit)
-                        -- Envia o evento para armazenar
                         toolsEvent:FireServer("StoreFruit")
-
-                        -- Espera um pouco para garantir que o servidor processou
                         task.wait(0.3)
-
-                        -- Desequipa para evitar ficar preso na fruta
                         unequipTool()
-
-                        -- Dá uma pausa pequena antes da próxima fruta
                         task.wait(0.1)
                     end
 
-                    -- Se não tiver frutas no backpack, espera um pouco antes de checar de novo
                     if #fruits == 0 then
                         task.wait(1)
                     end
