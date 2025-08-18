@@ -549,6 +549,81 @@ local Dropdown = sv:AddDropdown("DropdownFightingStyle", {
         DialogueEvent:FireServer(unpack(args))
     end
 })
+local sectionJobid = sv:AddSection("Job Id:");
+
+local currentJobId = ""
+
+local jobInput = sv:AddInput("JobInput", {
+    Title = "JobId",
+    Default = "",
+    Placeholder = "input id",
+    Numeric = false,
+    Finished = false,
+    Callback = function(text)
+        currentJobId = text
+        print("JobId:", currentJobId)
+    end
+})
+sv:AddButton({
+    Title = "Teleport",
+    Description = "",
+    Callback = function()
+        if currentJobId ~= "" then
+            game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, currentJobId, game.Players.LocalPlayer)
+        else
+            warn("nil")
+        end
+    end
+})
+
+sv:AddButton({
+    Title = "Clear Job Id",
+    Description = "",
+    Callback = function()
+        currentJobId = ""
+        jobInput:SetValue("")
+    end
+})
+local sectionJobid = sv:AddSection("Speed");
+local speedValue = 50
+local autoSpeed = false
+
+local Slider = sv:AddSlider("SliderSpeed", {
+    Title = "Speed",
+    Description = "Define your movement speed",
+    Default = 50,
+    Min = 1,
+    Max = 300,
+    Rounding = 0,
+    Callback = function(v)
+        speedValue = v
+        if autoSpeed then
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speedValue
+        end
+    end
+})
+
+local Toggle = sv:AddToggle("ToggleAutoSpeed", {
+    Title = "Auto Speed",
+    Default = false,
+    Callback = function(state)
+        autoSpeed = state
+        if autoSpeed then
+            task.spawn(function()
+                while autoSpeed do
+                    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+                        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speedValue
+                    end
+                    task.wait(0.1)
+                end
+            end)
+        else
+            if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+                game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+            end
+        end
+    end
+})
 
 local islands = {
     ["Air jump island"] = CFrame.new(3303.12891, 9.49221897, -4136.46143),
