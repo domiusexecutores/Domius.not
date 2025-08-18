@@ -369,6 +369,11 @@ local t = Window:AddTab({
 	Title = "Farm",
 	Icon = "home"
 })
+local se = Window:AddTab({
+	Title = "Server",
+	Icon = "moon-star"
+})
+
 local s = Window:AddTab({
 	Title = "Settings",
 	Icon = "settings"
@@ -549,11 +554,47 @@ local Dropdown = sv:AddDropdown("DropdownFightingStyle", {
         DialogueEvent:FireServer(unpack(args))
     end
 })
-local sectionJobid = sv:AddSection("Job Id:");
+local sectionJobid = se:AddSection("Status:");
+
+ServerVersionCheck = se:AddParagraph({
+    Title = "Server Version",
+    Content = "Versão: "
+})
+
+spawn(function()
+    local previousVersion = ""
+    while task.wait(1) do
+        local versionObj = game:GetService("Workspace"):FindFirstChild("ServerVersion")
+        local currentVersion = versionObj and versionObj.Value or "Desconhecida"
+        
+        if currentVersion ~= previousVersion then
+            ServerVersionCheck:SetDesc("Versão: " .. currentVersion)
+            previousVersion = currentVersion
+        end
+    end
+end)
+PlayerCountCheck = ss:AddParagraph({
+    Title = "Players",
+    Content = "Player: "
+})
+
+spawn(function()
+    local previousCount = ""
+    while task.wait(1) do
+        local players = game:GetService("Players")
+        local currentCount = players.NumPlayers .. "/" .. players.MaxPlayers
+        
+        if currentCount ~= previousCount then
+            PlayerCountCheck:SetDesc("Player: " .. currentCount)
+            previousCount = currentCount
+        end
+    end
+end)
+local sectionJobid = se:AddSection("Job Id:");
 
 local currentJobId = ""
 
-local jobInput = sv:AddInput("JobInput", {
+local jobInput = se:AddInput("JobInput", {
     Title = "JobId",
     Default = "",
     Placeholder = "input id",
@@ -564,7 +605,7 @@ local jobInput = sv:AddInput("JobInput", {
         print("JobId:", currentJobId)
     end
 })
-sv:AddButton({
+se:AddButton({
     Title = "Teleport",
     Description = "",
     Callback = function()
@@ -576,7 +617,7 @@ sv:AddButton({
     end
 })
 
-sv:AddButton({
+se:AddButton({
     Title = "Clear Job Id",
     Description = "",
     Callback = function()
@@ -584,11 +625,12 @@ sv:AddButton({
         jobInput:SetValue("")
     end
 })
-local sectionJobid = sv:AddSection("Speed");
+local sectionJobid = s:AddSection("Speed");
 local speedValue = 50
 local autoSpeed = false
+local speedLoopRunning = false
 
-local Slider = sv:AddSlider("SliderSpeed", {
+local Slider = s:AddSlider("SliderSpeed", {
     Title = "Speed",
     Description = "Define your movement speed",
     Default = 50,
@@ -597,29 +639,34 @@ local Slider = sv:AddSlider("SliderSpeed", {
     Rounding = 0,
     Callback = function(v)
         speedValue = v
-        if autoSpeed then
-            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speedValue
-        end
     end
 })
 
-local Toggle = sv:AddToggle("ToggleAutoSpeed", {
+local Toggle = s:AddToggle("ToggleAutoSpeed", {
     Title = "Auto Speed",
     Default = false,
     Callback = function(state)
         autoSpeed = state
-        if autoSpeed then
+        if autoSpeed and not speedLoopRunning then
+            speedLoopRunning = true
             task.spawn(function()
                 while autoSpeed do
-                    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
-                        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speedValue
+                    local player = game.Players.LocalPlayer
+                    if player.Character and player.Character:FindFirstChild("Humanoid") then
+                        player.Character.Humanoid.WalkSpeed = speedValue
                     end
-                    task.wait(0.1)
+                    task.wait(0.05)
+                end
+                speedLoopRunning = false
+                local player = game.Players.LocalPlayer
+                if player.Character and player.Character:FindFirstChild("Humanoid") then
+                    player.Character.Humanoid.WalkSpeed = 16
                 end
             end)
-        else
-            if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
-                game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+        elseif not autoSpeed and not speedLoopRunning then
+            local player = game.Players.LocalPlayer
+            if player.Character and player.Character:FindFirstChild("Humanoid") then
+                player.Character.Humanoid.WalkSpeed = 16
             end
         end
     end
