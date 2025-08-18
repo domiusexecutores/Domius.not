@@ -1627,3 +1627,45 @@ se:AddButton({
         end)
     end
 })
+local chestParent = workspace:FindFirstChild("IgnoreList")  
+    and workspace.IgnoreList:FindFirstChild("Int") 
+    and workspace.IgnoreList.Int:FindFirstChild("Chests")
+
+local toggleEnabled = false
+local rootPart = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+
+local function autoCollect()
+    while toggleEnabled do
+        if not chestParent then
+            break
+        end
+        for _, chestFolder in ipairs(chestParent:GetChildren()) do
+            if not toggleEnabled then break end
+            if chestFolder.Name:match("Chest") then
+                for _, descendant in ipairs(chestFolder:GetDescendants()) do
+                    if not toggleEnabled then break end
+                    if descendant:IsA("TouchTransmitter") then
+                        local part = descendant.Parent
+                        if part and part:IsA("BasePart") then
+                            firetouchinterest(rootPart, part, 0)
+                            firetouchinterest(rootPart, part, 1)
+                            task.wait(0.1)
+                        end
+                    end
+                end
+            end
+        end
+        task.wait(1)
+    end
+end
+
+local autoCollectToggle = t:AddToggle("AutoCollectChests", {
+    Title = "Auto Collect Chests",
+    Default = false,
+    Callback = function(state)
+        toggleEnabled = state
+        if toggleEnabled then
+            coroutine.wrap(autoCollect)()
+        end
+    end
+})
