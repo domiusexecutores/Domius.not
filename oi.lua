@@ -369,11 +369,6 @@ local t = Window:AddTab({
 	Title = "Farm",
 	Icon = "home"
 })
-local se = Window:AddTab({
-	Title = "Status",
-	Icon = "sun-medium"
-})
-
 local s = Window:AddTab({
 	Title = "Settings",
 	Icon = "settings"
@@ -389,6 +384,10 @@ local st = Window:AddTab({
 local f = Window:AddTab({
 	Title = "Fruit",
 	Icon = "activity"
+})
+local se = Window:AddTab({
+	Title = "Others",
+	Icon = "sun-medium"
 })
 
 
@@ -1431,7 +1430,7 @@ local Toggle = t:AddToggle("ToggleAutoStatus", {
 
 local configSection = s:AddSection("Config")
 
-local toggle = s:AddToggle("Click V2", {
+local toggle = t:AddToggle("Click V2", {
 	Title = "Click V2",
 	Default = false,
 	Callback = function(state)
@@ -1450,7 +1449,7 @@ local Slider = s:AddSlider("SliderExample", {
     end
 })
 
-local Dropdown = s:AddDropdown("DropdownExample", {
+local Dropdown = t:AddDropdown("DropdownExample", {
     Title = "Select Tool",
     Description = "Choose the tool you want to use",
     Values = {"CombatType", "Sword", "Gun", "Magic"},
@@ -1489,6 +1488,7 @@ s:AddButton({
         chooseTeam("Pirates")
     end
 })
+local configSection = se:AddSection("Optimization:")
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
@@ -1534,7 +1534,7 @@ local function removeCharacterDetails()
     end
 end
 
-s:AddButton({
+se:AddButton({
     Title = "Boost Fps",
     Description = "",
     Callback = function()
@@ -1574,10 +1574,56 @@ local function enableNoFog()
     end)
 end
 
-s:AddButton({
+se:AddButton({
     Title = "No Fog",
     Description = "",
     Callback = function()
         enableNoFog()
+    end
+})
+local configSection = se:AddSection("Servers:")
+se:AddButton({
+    Title = "Auto Rejoin",
+    Description = "",
+    Callback = function()
+        local Players = game:GetService("Players")
+        local TeleportService = game:GetService("TeleportService")
+        local placeId = game.PlaceId
+        local player = Players.LocalPlayer
+
+        task.spawn(function()
+            TeleportService:Teleport(placeId, player)
+        end)
+    end
+})
+
+se:AddButton({
+    Title = "Server Hop",
+    Description = "",
+    Callback = function()
+        local HttpService = game:GetService("HttpService")
+        local TeleportService = game:GetService("TeleportService")
+        local placeId = game.PlaceId
+        local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
+        local currentJobId = game.JobId
+
+        task.spawn(function()
+            local success, response = pcall(function()
+                return game:HttpGet("https://games.roblox.com/v1/games/"..placeId.."/servers/Public?sortOrder=Asc&limit=100")
+            end)
+
+            if success then
+                local data = HttpService:JSONDecode(response)
+                if data and data.data then
+                    for _, server in ipairs(data.data) do
+                        if server.id ~= currentJobId and server.playing < server.maxPlayers then
+                            TeleportService:TeleportToPlaceInstance(placeId, server.id, player)
+                            break
+                        end
+                    end
+                end
+            end
+        end)
     end
 })
