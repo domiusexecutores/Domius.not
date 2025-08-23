@@ -704,6 +704,13 @@ function CheckQuest()
             NameMon = "Skull Slayer"
             CFrameQuest = CFrame.new(-16665.1914, 104.596405, 1579.69434, 0.951068401, -0, -0.308980465, 0, 1, -0, 0.308980465, 0, 0.951068401)
             CFrameMon = CFrame.new(-16855.043, 122.457253, 1478.15308, -0.999392271, 0, -0.0348687991, 0, 1, 0, 0.0348687991, 0, -0.999392271)
+        elseif MyLevel >= 2650 then
+            Mon = "Sea Chanter"
+            LevelQuest = 1
+            NameQuest = "SubmergedQuest2"
+            NameMon = "Sea Chanter"
+            CFrameQuest = CFrame.new(10880.8037, -2086.229, 10033.6025, -0.0447259173, 4.50140947e-09, -0.998999298, -3.9233754e-08, 1, 6.26244168e-09, 0.998999298, 3.94745854e-08, -0.0447259173)
+            CFrameMon = CFrame.new(10669.2119, -2057.61938, 10046.3857, -0.945043504, -1.7312269e-08, 0.326944619, -4.4065473e-08, 1, -7.44209245e-08, -0.326944619, -8.47379766e-08, -0.945043504)
         end
     end
 end
@@ -1329,7 +1336,7 @@ function AttackNoCoolDown()
 end
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local Window = Fluent:CreateWindow({
-	Title = "Domius - Vox Seas",
+	Title = "Domius - Blox fruits",
 	SubTitle = "by mini hell",
 	TabWidth = 160,
 	Size = UDim2.fromOffset(500, 300),
