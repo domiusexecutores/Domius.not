@@ -1350,15 +1350,15 @@ local t = Window:AddTab({
 })
 
 
-local dropdownFarm = t:AddDropdown("DropdownFarm", {
+local drodown = t:AddDropdown("DropdownFarm", {
     Title = "Select Method Farm",
     Values = {"Farm Level", "Farm Bone", "Farm Katakuri"},
-    Default = "Farm Level",  -- substitui Dropdown:SetValue
-    Multi = false,           -- mantém Multi = false
-    Callback = function(selected)
-        FarmMode = selected  -- substitui Dropdown:OnChanged
-    end
+    Multi = false,
 })
+Dropdown:SetValue("Farm Level")
+Dropdown:OnChanged(function(Value)
+FarmMode = Value
+end)
 spawn(function()
     local canRun = true
     local debounceTime = 0.5
