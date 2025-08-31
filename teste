@@ -1,5 +1,5 @@
--- BananaCat-Style UI Library (fixed center + closer to BananaHub look)
--- Features: Tabs (left sidebar), Sections (right), Search, Toggle, Dropdown, Slider, Button, Image support
+-- Banana Hub Style Full UI
+-- Créditos: recriação com todos os widgets (Toggle, Slider, Dropdown, Image, Tabs)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -8,133 +8,364 @@ local LocalPlayer = Players.LocalPlayer
 local BananaUI = {}
 BananaUI.__index = BananaUI
 
-local function newInstance(class, props, children)
+-- Helpers
+local function new(class, props, children)
     local obj = Instance.new(class)
-    for k, v in pairs(props or {}) do obj[k] = v end
-    for _, child in ipairs(children or {}) do child.Parent = obj end
+    for k,v in pairs(props or {}) do obj[k] = v end
+    for _,c in ipairs(children or {}) do c.Parent = obj end
     return obj
 end
 
-local function mkCorner(rad)
-    return newInstance("UICorner", {CornerRadius = UDim.new(0, rad)})
+local function mkCorner(r)
+    return new("UICorner", {CornerRadius = UDim.new(0,r)})
 end
 
-local function mkStroke(thick, col, trans)
-    return newInstance("UIStroke", {Thickness = thick or 1.2, Color = col or Color3.fromRGB(30,30,35), Transparency = trans or 0.15, ApplyStrokeMode = Enum.ApplyStrokeMode.Border})
+local function mkStroke()
+    return new("UIStroke", {Color = Color3.fromRGB(255,255,255), Transparency = 0.2, Thickness = 1})
 end
 
-local function tween(obj, info, goal)
-    game:GetService("TweenService"):Create(obj, info, goal):Play()
-end
-
-local function makeWindow(opts)
+-- Main window
+function BananaUI.CreateWindow(opts)
     opts = opts or {}
-    local title = opts.Title or "Banana Cat Hub"
-    local subtitle = opts.SubTitle or ""
-    local size = opts.Size or UDim2.fromOffset(860, 520)
+    local title = opts.Title or "Banana Hub"
+    local subtitle = opts.SubTitle or "By Banana Cat"
 
     local ui = setmetatable({}, BananaUI)
 
-    local gui = newInstance("ScreenGui", {ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling, Name = "BananaCatUI"})
-    gui.Parent = game:GetService("CoreGui") or LocalPlayer:WaitForChild("PlayerGui")
+    local gui = new("ScreenGui", {Name="BananaHubUI", ResetOnSpawn=false}, {})
+    gui.Parent = game:GetService("CoreGui")
 
-    -- Main root (draggable + center)
-    local root = newInstance("Frame", {
-        Size = size,
-        BackgroundColor3 = Color3.fromRGB(22,24,31),
-        BackgroundTransparency = 0.05,
-        Position = UDim2.new(0.5, 0, 0.5, 0),
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        BorderSizePixel = 0,
-        Name = "Root"
-    }, {
-        mkCorner(18),
-        mkStroke(1.4, Color3.fromRGB(255,255,255), 0.85)
-    })
+    local root = new("Frame", {
+        Size = UDim2.fromOffset(500,300),
+        Position = UDim2.new(0.5,0,0.5,0),
+        AnchorPoint = Vector2.new(0.5,0.5),
+        BackgroundColor3 = Color3.fromRGB(25,25,30),
+        Visible = false
+    }, {mkCorner(12), mkStroke()})
     root.Parent = gui
 
-    -- Dragging
-    do
-        local dragging, dragStart, startPos
-        root.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                dragging = true
-                dragStart = input.Position
-                startPos = root.Position
-                input.Changed:Connect(function()
-                    if input.UserInputState == Enum.UserInputState.End then dragging = false end
-                end)
+    -- Toggle open/close with End key
+    UserInputService.InputBegan:Connect(function(i,g)
+        if g then return end
+        if i.KeyCode == Enum.KeyCode.End then
+            root.Visible = not root.Visible
+        end
+    end)
+
+    -- Topbar
+    local top = new("Frame", {
+        BackgroundColor3 = Color3.fromRGB(35,38,50),
+        Size = UDim2.new(1,0,0,36)
+    }, {mkCorner(12)})
+    top.Parent = root
+
+    local lbl = new("TextLabel", {
+        BackgroundTransparency=1,
+        Font=Enum.Font.GothamBold,
+        Text=title.." | "..subtitle,
+        TextSize=14,
+        TextColor3=Color3.fromRGB(255,214,64),
+        Position=UDim2.fromOffset(12,0),
+        Size=UDim2.new(1,-24,1,0),
+        TextXAlignment=Enum.TextXAlignment.Left
+    })
+    lbl.Parent = top
+
+    -- Sidebar
+    local sidebar = new("Frame", {
+        BackgroundColor3=Color3.fromRGB(40,43,58),
+        Size=UDim2.new(0,120,1,-36),
+        Position=UDim2.new(0,0,0,36)
+    }, {mkCorner(10)})
+    sidebar.Parent = root
+
+    local sbScroll = new("ScrollingFrame", {
+        Active=true,
+        BackgroundTransparency=1,
+        Size=UDim2.new(1,0,1,0),
+        ScrollBarThickness=2
+    }, {new("UIListLayout", {Padding=UDim.new(0,4)})})
+    sbScroll.Parent = sidebar
+
+    -- Page container
+    local pageFrame = new("Frame", {
+        BackgroundColor3=Color3.fromRGB(45,48,65),
+        Size=UDim2.new(1,-130,1,-44),
+        Position=UDim2.new(0,126,0,42)
+    }, {mkCorner(10)})
+    pageFrame.Parent = root
+
+    local pageTitle = new("TextLabel", {
+        BackgroundTransparency=1,
+        Font=Enum.Font.GothamBold,
+        Text="",
+        TextSize=14,
+        TextColor3=Color3.fromRGB(230,230,235),
+        Position=UDim2.fromOffset(8,6),
+        Size=UDim2.new(1,-16,0,20),
+        TextXAlignment=Enum.TextXAlignment.Left
+    })
+    pageTitle.Parent = pageFrame
+
+    ui._tabs = {}
+    ui._currentTab = nil
+
+    function ui:AddTab(name)
+        local tab = {Name=name}
+        local btn = new("TextButton", {
+            Text=name,
+            Font=Enum.Font.GothamBold,
+            TextSize=14,
+            TextColor3=Color3.fromRGB(220,220,225),
+            BackgroundColor3=Color3.fromRGB(50,53,70),
+            Size=UDim2.new(1,-8,0,28),
+            AutoButtonColor=false
+        }, {mkCorner(6)})
+        btn.Parent = sbScroll
+
+        local container = new("ScrollingFrame", {
+            Active=true,
+            BackgroundTransparency=1,
+            Size=UDim2.new(1,-8,1,-30),
+            Position=UDim2.fromOffset(4,26),
+            Visible=false,
+            ScrollBarThickness=2
+        }, {new("UIListLayout", {Padding=UDim.new(0,6)})})
+        container.Parent = pageFrame
+
+        btn.MouseButton1Click:Connect(function()
+            for _,t in ipairs(ui._tabs) do
+                t.Button.BackgroundColor3 = Color3.fromRGB(50,53,70)
+                t.Container.Visible = false
             end
+            btn.BackgroundColor3 = Color3.fromRGB(67,104,255)
+            container.Visible = true
+            pageTitle.Text = name
+            ui._currentTab = tab
         end)
-        UserInputService.InputChanged:Connect(function(input)
-            if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-                local delta = input.Position - dragStart
-                root.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+
+        tab.Button = btn
+        tab.Container = container
+        table.insert(ui._tabs, tab)
+        if not ui._currentTab then btn.MouseButton1Click() end
+        return tab
+    end
+
+    -- Section
+    function ui:AddSection(tab, name)
+        local sec = new("Frame", {
+            BackgroundColor3=Color3.fromRGB(55,58,75),
+            Size=UDim2.new(1,-8,0,100)
+        }, {mkCorner(8)})
+        sec.Parent = tab.Container
+
+        new("TextLabel", {
+            BackgroundTransparency=1,
+            Font=Enum.Font.GothamBold,
+            Text=name,
+            TextSize=14,
+            TextColor3=Color3.fromRGB(255,255,255),
+            Position=UDim2.fromOffset(6,4),
+            Size=UDim2.new(1,-12,0,20),
+            TextXAlignment=Enum.TextXAlignment.Left
+        }).Parent = sec
+
+        return sec
+    end
+
+    -- Button
+    function ui:Button(parent,text,callback)
+        local btn = new("TextButton", {
+            Text=text,
+            Font=Enum.Font.Gotham,
+            TextSize=14,
+            TextColor3=Color3.fromRGB(255,255,255),
+            BackgroundColor3=Color3.fromRGB(70,74,100),
+            Size=UDim2.new(1,-12,0,28),
+            Position=UDim2.fromOffset(6,28)
+        }, {mkCorner(6)})
+        btn.Parent = parent
+        btn.MouseButton1Click:Connect(function()
+            if callback then callback() end
+        end)
+    end
+
+    -- Toggle (switch style)
+    function ui:Toggle(parent,text,callback)
+        local frame = new("Frame", {
+            BackgroundTransparency=1,
+            Size=UDim2.new(1,-12,0,28),
+            Position=UDim2.fromOffset(6,62)
+        })
+        frame.Parent = parent
+
+        local lbl = new("TextLabel", {
+            BackgroundTransparency=1,
+            Text=text,
+            Font=Enum.Font.Gotham,
+            TextSize=14,
+            TextColor3=Color3.fromRGB(255,255,255),
+            Size=UDim2.new(1,-40,1,0),
+            TextXAlignment=Enum.TextXAlignment.Left
+        })
+        lbl.Parent = frame
+
+        local btn = new("TextButton", {
+            BackgroundColor3=Color3.fromRGB(90,90,110),
+            Size=UDim2.fromOffset(36,18),
+            Position=UDim2.new(1,-36,0.5,0),
+            AnchorPoint=Vector2.new(0,0.5),
+            AutoButtonColor=false
+        }, {mkCorner(9)})
+        btn.Parent = frame
+
+        local knob = new("Frame", {
+            BackgroundColor3=Color3.fromRGB(255,255,255),
+            Size=UDim2.fromOffset(16,16),
+            Position=UDim2.new(0,1,0.5,0),
+            AnchorPoint=Vector2.new(0,0.5)
+        }, {mkCorner(8)})
+        knob.Parent = btn
+
+        local state = false
+        btn.MouseButton1Click:Connect(function()
+            state = not state
+            if state then
+                btn.BackgroundColor3 = Color3.fromRGB(67,104,255)
+                knob.Position = UDim2.new(1,-17,0.5,0)
+            else
+                btn.BackgroundColor3 = Color3.fromRGB(90,90,110)
+                knob.Position = UDim2.new(0,1,0.5,0)
+            end
+            if callback then callback(state) end
+        end)
+    end
+
+    -- Slider
+    function ui:Slider(parent,text,min,max,callback)
+        local frame = new("Frame", {
+            BackgroundTransparency=1,
+            Size=UDim2.new(1,-12,0,40),
+            Position=UDim2.fromOffset(6,96)
+        })
+        frame.Parent = parent
+
+        local lbl = new("TextLabel", {
+            BackgroundTransparency=1,
+            Text=text..": "..min,
+            Font=Enum.Font.Gotham,
+            TextSize=14,
+            TextColor3=Color3.fromRGB(255,255,255),
+            Size=UDim2.new(1,0,0,20),
+            TextXAlignment=Enum.TextXAlignment.Left
+        })
+        lbl.Parent = frame
+
+        local bar = new("Frame", {
+            BackgroundColor3=Color3.fromRGB(90,90,110),
+            Size=UDim2.new(1,0,0,6),
+            Position=UDim2.fromOffset(0,26)
+        }, {mkCorner(3)})
+        bar.Parent = frame
+
+        local fill = new("Frame", {
+            BackgroundColor3=Color3.fromRGB(67,104,255),
+            Size=UDim2.new(0,0,1,0)
+        }, {mkCorner(3)})
+        fill.Parent = bar
+
+        local dragging=false
+        bar.InputBegan:Connect(function(i)
+            if i.UserInputType==Enum.UserInputType.MouseButton1 then dragging=true end
+        end)
+        bar.InputEnded:Connect(function(i)
+            if i.UserInputType==Enum.UserInputType.MouseButton1 then dragging=false end
+        end)
+        UserInputService.InputChanged:Connect(function(i)
+            if dragging and i.UserInputType==Enum.UserInputType.MouseMovement then
+                local rel=(i.Position.X-bar.AbsolutePosition.X)/bar.AbsoluteSize.X
+                rel=math.clamp(rel,0,1)
+                fill.Size=UDim2.new(rel,0,1,0)
+                local val=math.floor(min+(max-min)*rel)
+                lbl.Text=text..": "..val
+                if callback then callback(val) end
             end
         end)
     end
 
-    -- Topbar
-    local top = newInstance("Frame", {
-        BackgroundColor3 = Color3.fromRGB(30,34,44),
-        Size = UDim2.new(1, -16, 0, 52),
-        Position = UDim2.fromOffset(8,8),
-        BorderSizePixel = 0,
-        Name="Topbar"
-    }, {mkCorner(14), mkStroke(1.2, Color3.fromRGB(255,255,255), 0.86)})
-    top.Parent = root
+    -- Dropdown
+    function ui:Dropdown(parent,text,options,callback)
+        local frame = new("Frame", {
+            BackgroundColor3=Color3.fromRGB(70,74,100),
+            Size=UDim2.new(1,-12,0,28),
+            Position=UDim2.fromOffset(6,140)
+        }, {mkCorner(6)})
+        frame.Parent = parent
 
-    local titleLbl = newInstance("TextLabel", {
-        BackgroundTransparency = 1,
-        Font = Enum.Font.GothamBold,
-        Text = (title .. " ") .. (opts.Temperature or "105 Temperature"),
-        TextSize = 18,
-        TextColor3 = Color3.fromRGB(255, 214, 64),
-        Position = UDim2.fromOffset(16, 7),
-        Size = UDim2.new(1, -150, 1, -14),
-        TextXAlignment = Enum.TextXAlignment.Left
-    })
-    titleLbl.Parent = top
+        local lbl = new("TextLabel", {
+            BackgroundTransparency=1,
+            Text=text..": ",
+            Font=Enum.Font.Gotham,
+            TextSize=14,
+            TextColor3=Color3.fromRGB(255,255,255),
+            Size=UDim2.new(1,-20,1,0),
+            TextXAlignment=Enum.TextXAlignment.Left
+        })
+        lbl.Parent = frame
 
-    local subLbl = newInstance("TextLabel", {
-        BackgroundTransparency = 1,
-        Font = Enum.Font.Gotham,
-        Text = subtitle,
-        TextSize = 14,
-        TextColor3 = Color3.fromRGB(200,200,210),
-        Position = UDim2.fromOffset(16, 28),
-        Size = UDim2.fromOffset(280, 18),
-        TextXAlignment = Enum.TextXAlignment.Left
-    })
-    subLbl.Parent = top
+        local ddBtn = new("TextButton", {
+            BackgroundTransparency=1,
+            Text="▼",
+            Font=Enum.Font.GothamBold,
+            TextSize=14,
+            TextColor3=Color3.fromRGB(255,255,255),
+            Size=UDim2.new(0,20,1,0),
+            Position=UDim2.new(1,-20,0,0)
+        })
+        ddBtn.Parent = frame
 
-    -- Left sidebar
-    local sidebar = newInstance("Frame", {
-        BackgroundColor3 = Color3.fromRGB(30,34,44),
-        BorderSizePixel = 0,
-        Size = UDim2.new(0, 220, 1, -76),
-        Position = UDim2.fromOffset(8, 68),
-        Name = "Sidebar"
-    }, {mkCorner(14), mkStroke(1.2, nil, 0.86)})
-    sidebar.Parent = root
+        local list = new("Frame", {
+            BackgroundColor3=Color3.fromRGB(50,53,70),
+            Size=UDim2.new(1,0,0,#options*22),
+            Position=UDim2.new(0,0,1,0),
+            Visible=false
+        }, {mkCorner(6)})
+        list.Parent = frame
 
-    -- Right content area
-    local pageFrame = newInstance("Frame", {
-        BackgroundColor3 = Color3.fromRGB(30,34,44),
-        BorderSizePixel = 0,
-        Size = UDim2.new(1, -244, 1, -76),
-        Position = UDim2.fromOffset(236, 68),
-        Name = "PageFrame"
-    }, {mkCorner(14), mkStroke(1.2, nil, 0.86)})
-    pageFrame.Parent = root
+        for _,opt in ipairs(options) do
+            local optBtn = new("TextButton", {
+                BackgroundTransparency=1,
+                Text=opt,
+                Font=Enum.Font.Gotham,
+                TextSize=14,
+                TextColor3=Color3.fromRGB(255,255,255),
+                Size=UDim2.new(1,0,0,22)
+            })
+            optBtn.Parent = list
+            optBtn.MouseButton1Click:Connect(function()
+                lbl.Text=text..": "..opt
+                list.Visible=false
+                if callback then callback(opt) end
+            end)
+        end
 
-    -- (resto do código igual, widgets, abas, sections, etc)
+        ddBtn.MouseButton1Click:Connect(function()
+            list.Visible=not list.Visible
+        end)
+    end
+
+    -- Image
+    function ui:Image(parent,id)
+        local img = new("ImageLabel", {
+            BackgroundTransparency=1,
+            Image=id,
+            Size=UDim2.fromOffset(64,64),
+            Position=UDim2.fromOffset(8,174)
+        }, {mkCorner(12)})
+        img.Parent = parent
+    end
 
     return ui
-end
-
-function BananaUI.CreateWindow(opts)
-    return makeWindow(opts)
 end
 
 return BananaUI
