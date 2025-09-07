@@ -1,0 +1,265 @@
+repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+
+-- Cria a tela preta inicial
+local screenGui = Instance.new("ScreenGui")
+screenGui.IgnoreGuiInset = true
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local bg = Instance.new("Frame")
+bg.Size = UDim2.new(1,0,1,0)
+bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
+bg.Parent = screenGui
+
+-- Funções de fade
+local function fadeIn(obj,time)
+    time = time or 1
+    if obj:IsA("ImageLabel") or obj:IsA("ImageButton") then
+        obj.ImageTransparency = 1
+        TweenService:Create(obj,TweenInfo.new(time),{ImageTransparency=0}):Play()
+    elseif obj:IsA("TextLabel") or obj:IsA("TextButton") then
+        obj.TextTransparency = 1
+        TweenService:Create(obj,TweenInfo.new(time),{TextTransparency=0}):Play()
+    end
+end
+
+local function fadeOut(obj,time)
+    time = time or 1
+    if obj:IsA("ImageLabel") or obj:IsA("ImageButton") then
+        TweenService:Create(obj,TweenInfo.new(time),{ImageTransparency=1}):Play()
+    elseif obj:IsA("TextLabel") or obj:IsA("TextButton") then
+        TweenService:Create(obj,TweenInfo.new(time),{TextTransparency=1}):Play()
+    end
+end
+
+-- Função para mostrar Features
+local function showFeature(titleText,topics,iconId,delayTime)
+    local frame = Instance.new("Frame")
+    frame.AnchorPoint = Vector2.new(0.5,0.5)
+    frame.Position = UDim2.new(0.5,0,0.5,0)
+    frame.Size = UDim2.new(0.7,0,0.4,0)
+    frame.BackgroundTransparency = 1
+    frame.Parent = bg
+
+    local icon = Instance.new("ImageLabel")
+    icon.Size = UDim2.new(0.15,0,1,0)
+    icon.Position = UDim2.new(0,0,0,0)
+    icon.BackgroundTransparency = 1
+    if iconId then
+        icon.Image = "rbxassetid://"..iconId
+    end
+    icon.Parent = frame
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(0.8,0,0.25,0)
+    title.Position = UDim2.new(0.2,0,0,0)
+    title.Text = titleText
+    title.TextColor3 = Color3.fromRGB(200,160,255)
+    title.BackgroundTransparency = 1
+    title.Font = Enum.Font.GothamBlack
+    title.TextScaled = true
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.TextStrokeTransparency = 0.4
+    title.TextStrokeColor3 = Color3.fromRGB(255,255,255)
+    title.Parent = frame
+
+    local yOffset = 0.3
+    for _, topic in ipairs(topics) do
+        local lbl = Instance.new("TextLabel")
+        lbl.Size = UDim2.new(0.8,0,0.15,0)
+        lbl.Position = UDim2.new(0.2,0,yOffset,0)
+        lbl.Text = "• "..topic
+        lbl.TextColor3 = Color3.fromRGB(255,255,255)
+        lbl.BackgroundTransparency = 1
+        lbl.Font = Enum.Font.Gotham
+        lbl.TextScaled = true
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.TextStrokeTransparency = 0.4
+        lbl.TextStrokeColor3 = Color3.fromRGB(200,160,255)
+        lbl.Parent = frame
+        yOffset = yOffset + 0.18
+        fadeIn(lbl,1)
+    end
+
+    fadeIn(icon, 1)
+    fadeIn(title,1)
+    task.wait(delayTime or 4)
+    fadeOut(frame,0.8)
+    task.wait(0.9)
+    frame:Destroy()
+end
+
+-- Tela de abertura
+local headerFrame = Instance.new("Frame")
+headerFrame.Size = UDim2.new(0.8,0,0.15,0)
+headerFrame.AnchorPoint = Vector2.new(0.5,0)
+headerFrame.Position = UDim2.new(0.5,0,0.05,0)
+headerFrame.BackgroundTransparency = 1
+headerFrame.Parent = bg
+
+local header = Instance.new("TextLabel")
+header.Size = UDim2.new(1,0,0.5,0)
+header.Text = "DOMIUS PRESENTS"
+header.TextColor3 = Color3.fromRGB(200,160,255)
+header.BackgroundTransparency = 1
+header.Font = Enum.Font.GothamBlack
+header.TextScaled = true
+header.TextXAlignment = Enum.TextXAlignment.Center
+header.TextStrokeTransparency = 0.4
+header.TextStrokeColor3 = Color3.fromRGB(255,255,255)
+header.Parent = headerFrame
+fadeIn(header,1.5)
+
+local iconImage = Instance.new("ImageLabel")
+iconImage.Size = UDim2.new(0.2,0,0.5,0)
+iconImage.AnchorPoint = Vector2.new(0.5,0)
+iconImage.Position = UDim2.new(0.5,0,0.5,0)
+iconImage.Image = "rbxassetid://136627086197355"
+iconImage.BackgroundTransparency = 1
+iconImage.Parent = headerFrame
+fadeIn(iconImage,1.5)
+
+task.wait(2)
+fadeOut(header,1)
+fadeOut(iconImage,1)
+task.wait(1)
+headerFrame:Destroy()
+
+-- Sequência de features
+showFeature("SELF", {"TIKI","HYDRA ISLAND"}, "96723243317017",5)
+showFeature("LEVIATHAN", {"Auto Find","Auto Sanguine","Auto Heart"}, "95170336601046",5)
+showFeature("ITEMS", {"Auto Craft Items"}, "86260281941997",5)
+
+-- Mensagem final
+local questionFrame = Instance.new("Frame")
+questionFrame.Size = UDim2.new(0.6,0,0.35,0)
+questionFrame.AnchorPoint = Vector2.new(0.5,0.5)
+questionFrame.Position = UDim2.new(0.5,0,0.5,0)
+questionFrame.BackgroundTransparency = 1
+questionFrame.Parent = bg
+
+local question = Instance.new("TextLabel")
+question.Size = UDim2.new(0.9,0,0.5,0)
+question.Position = UDim2.new(0.05,0,0,0)
+question.Text = "Are you excited to test this with me?"
+question.TextColor3 = Color3.fromRGB(255,255,255)
+question.BackgroundTransparency = 1
+question.Font = Enum.Font.GothamBlack
+question.TextScaled = true
+question.TextStrokeTransparency = 0.4
+question.TextStrokeColor3 = Color3.fromRGB(200,160,255)
+question.Parent = questionFrame
+fadeIn(question,1)
+
+local thank = Instance.new("TextLabel")
+thank.Size = UDim2.new(0.9,0,0.25,0)
+thank.Position = UDim2.new(0.05,0,0.55,0)
+thank.Text = "Thank you, "..player.Name
+thank.TextColor3 = Color3.fromRGB(200,160,255)
+thank.BackgroundTransparency = 1
+thank.Font = Enum.Font.GothamBlack
+thank.TextScaled = true
+thank.TextStrokeTransparency = 0.4
+thank.TextStrokeColor3 = Color3.fromRGB(255,255,255)
+thank.Parent = questionFrame
+fadeIn(thank,1)
+
+local devLabel = Instance.new("TextLabel")
+devLabel.Size = UDim2.new(1,0,0.15,0)
+devLabel.Position = UDim2.new(0,0,0.85,0)
+devLabel.Text = "Dev By Mini Hell"
+devLabel.TextColor3 = Color3.fromRGB(180,180,180)
+devLabel.BackgroundTransparency = 1
+devLabel.Font = Enum.Font.GothamBold
+devLabel.TextScaled = true
+devLabel.TextXAlignment = Enum.TextXAlignment.Center
+devLabel.Parent = bg
+fadeIn(devLabel,1)
+
+task.wait(4)
+fadeOut(questionFrame,0.8)
+fadeOut(devLabel,0.8)
+task.wait(1)
+questionFrame:Destroy()
+devLabel:Destroy()
+
+-- Agora, chama a interface de Key Verification
+local function showKeyUI()
+    local keyGui = Instance.new("ScreenGui")
+    keyGui.Name = "KeyVerificationUI"
+    keyGui.ResetOnSpawn = false
+    keyGui.Parent = player:WaitForChild("PlayerGui")
+
+    local keyFrame = Instance.new("Frame")
+    keyFrame.Size = UDim2.new(0,0,0,0)
+    keyFrame.AnchorPoint = Vector2.new(0.5,0.5)
+    keyFrame.Position = UDim2.new(0.5,0,0.5,0)
+    keyFrame.BackgroundColor3 = Color3.fromRGB(30,30,35)
+    keyFrame.BorderSizePixel = 0
+    keyFrame.Parent = keyGui
+
+    local uiCorner = Instance.new("UICorner")
+    uiCorner.CornerRadius = UDim.new(0,20)
+    uiCorner.Parent = keyFrame
+
+    local uistroke = Instance.new("UIStroke")
+    uistroke.Color = Color3.fromRGB(100,100,255)
+    uistroke.Thickness = 2
+    uistroke.Parent = keyFrame
+
+    TweenService:Create(keyFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0.45,0,0.45,0)}):Play()
+
+    -- Caixa de input
+    local textBox = Instance.new("TextBox")
+    textBox.Size = UDim2.new(0.8,0,0.2,0)
+    textBox.Position = UDim2.new(0.1,0,0.25,0)
+    textBox.PlaceholderText = "Digite sua key..."
+    textBox.TextColor3 = Color3.fromRGB(255,255,255)
+    textBox.PlaceholderColor3 = Color3.fromRGB(150,150,150)
+    textBox.BackgroundColor3 = Color3.fromRGB(45,45,50)
+    textBox.BorderSizePixel = 0
+    textBox.ClearTextOnFocus = false
+    textBox.Font = Enum.Font.GothamBold
+    textBox.TextScaled = true
+    textBox.TextWrapped = true
+    textBox.TextEditable = true
+    textBox.Text = ""
+    textBox.Parent = keyFrame
+    textBox:CaptureFocus()
+
+    -- Botão Verify
+    local verifyBtn = Instance.new("TextButton")
+    verifyBtn.Size = UDim2.new(0.35,0,0.18,0)
+    verifyBtn.Position = UDim2.new(0.1,0,0.6,0)
+    verifyBtn.Text = "Verificar"
+    verifyBtn.Font = Enum.Font.GothamBold
+    verifyBtn.TextScaled = true
+    verifyBtn.BackgroundColor3 = Color3.fromRGB(130,90,250)
+    verifyBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    verifyBtn.Parent = keyFrame
+
+    local function checkKey()
+        if textBox.Text == "YOUR_KEY_HERE" then
+            keyGui:Destroy()
+        else
+            textBox.Text = ""
+            textBox.PlaceholderText = "Key incorreta!"
+            textBox.PlaceholderColor3 = Color3.fromRGB(255,80,80)
+            textBox:CaptureFocus()
+        end
+    end
+
+    verifyBtn.MouseButton1Click:Connect(checkKey)
+    textBox.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            checkKey()
+        end
+    end)
+end
+
+-- Chama a interface de key
+showKeyUI()
